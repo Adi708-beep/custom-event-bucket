@@ -75,24 +75,46 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
     e.preventDefault();
     const blockType = e.dataTransfer.getData(BLOCK_MIME);
     const movingId = e.dataTransfer.getData(NODE_MIME);
-    setNodes((prev) => {
-      const idx = prev.findIndex((n) => n.id === sectionId);
-      if (idx === -1) return prev;
-      const section = prev[idx];
-      const children = [...(section.children || [])];
-      if (blockType) {
-        const spec = findSpec(blockType);
-        if (!spec) return prev;
-        const node = spec.defaultNode();
+
+    if (blockType) {
+      const spec = findSpec(blockType);
+      if (!spec) return;
+      const node = spec.defaultNode();
+      setNodes((prev) => {
+        const idx = prev.findIndex((n) => n.id === sectionId);
+        if (idx === -1) return prev;
+        const section = prev[idx];
+        const children = [...(section.children || [])];
         children.push(node);
         const updated: BuilderNode = { ...section, children };
         const next = [...prev];
         next[idx] = updated;
-        setSelectedId(node.id);
         return next;
-      }
-      if (movingId) {
-        // Move top-level node into section
+      });
+      setSelectedId(node.id);
+      setTimeout(() => {
+        const el = document.querySelector(`[data-editable-id="${node.id}"]`) as HTMLElement | null;
+        if (el) {
+          el.focus();
+          try {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          } catch {}
+        }
+      }, 50);
+      return;
+    }
+
+    if (movingId) {
+      setNodes((prev) => {
+        const idx = prev.findIndex((n) => n.id === sectionId);
+        if (idx === -1) return prev;
+        const section = prev[idx];
+        const children = [...(section.children || [])];
         const fromIdx = prev.findIndex((n) => n.id === movingId);
         if (fromIdx === -1) return prev;
         const next = [...prev];
@@ -100,9 +122,9 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
         children.push(moved);
         next[idx] = { ...section, children };
         return next;
-      }
-      return prev;
-    });
+      });
+      return;
+    }
   };
 
   const Outline = ({ id, children }: { id: string; children: React.ReactNode }) => (
