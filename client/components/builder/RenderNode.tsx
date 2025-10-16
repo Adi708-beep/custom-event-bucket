@@ -187,8 +187,8 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
           <div className="flex items-center gap-4">
             <img src={photo} alt={name} className="h-16 w-16 rounded-full border object-cover" />
             <div>
-              <EditableText id={node.id} value={name} tag="div" className="font-medium" onCommit={(v) => apply({ name: v })} />
-              <EditableText id={`${node.id}_role`} value={role} tag="div" className="text-sm text-muted-foreground" onCommit={(v) => apply({ role: v })} />
+              <EditableText id={node.id} value={name} tag="div" className="font-medium" style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ name: v })} />
+              <EditableText id={`${node.id}_role`} value={role} tag="div" className="text-sm text-muted-foreground" style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ role: v })} />
             </div>
           </div>
         </Wrapper>
