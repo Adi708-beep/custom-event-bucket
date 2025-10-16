@@ -6,6 +6,7 @@ import { blockSpecs } from "@/components/builder/blocks";
 import { BuilderNode, NodeID } from "@/components/builder/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import ThemePicker, { palettes, applyPalette } from "@/components/builder/ThemePicker";
 
 const STORAGE_KEY = "eventbucket:page";
 
