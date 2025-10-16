@@ -82,8 +82,15 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
   const wrapperClasses = `${node.props?.frame ? "border p-4 rounded-md" : ""}`;
   const maxW = widthStyleFor(node);
 
+  const commonStyle: React.CSSProperties = {
+    transform: node.props?.rotate ? `rotate(${node.props.rotate}deg)` : undefined,
+    position: node.props?.absolute ? 'absolute' : undefined,
+    left: node.props?.absolute ? node.props.left ?? undefined : undefined,
+    top: node.props?.absolute ? node.props.top ?? undefined : undefined,
+  } as any;
+
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <div data-node-id={node.id} className={`mx-auto ${wrapperClasses}`} style={{ maxWidth: maxW }}>
+    <div data-node-id={node.id} className={`mx-auto ${wrapperClasses}`} style={{ maxWidth: maxW, position: node.props?.absolute ? 'relative' : undefined }}>
       {children}
     </div>
   );
