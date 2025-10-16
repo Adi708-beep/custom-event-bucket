@@ -7,7 +7,7 @@ import { BuilderNode, NodeID } from "@/components/builder/types";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const STORAGE_KEY = "eventcraft:page";
+const STORAGE_KEY = "eventbucket:page";
 
 function sampleEventTemplate(): BuilderNode[] {
   const sectionHero = blockSpecs.find((b) => b.type === "section")!.defaultNode();
