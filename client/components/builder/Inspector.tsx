@@ -140,6 +140,31 @@ export default function Inspector({ nodes, setNodes, selectedId }: InspectorProp
             <Label htmlFor="text">Text</Label>
             <Input id="text" value={selected.props.text} onChange={(e) => updateProps({ text: e.target.value })} />
           </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-2">
+              <Label htmlFor="size">Font size</Label>
+              <Input id="size" type="number" value={selected.props.fontSize || 32} onChange={(e) => updateProps({ fontSize: Number(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="weight">Weight</Label>
+              <Select onValueChange={(v) => updateProps({ fontWeight: v })} value={String(selected.props.fontWeight || '700')}>
+                <SelectTrigger id="weight"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="400">400</SelectItem>
+                  <SelectItem value="600">600</SelectItem>
+                  <SelectItem value="700">700</SelectItem>
+                  <SelectItem value="800">800</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="color">Color</Label>
+            <Input id="color" type="color" value={selected.props.color || '#111827'} onChange={(e) => updateProps({ color: e.target.value })} />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="level">Level</Label>
             <Select onValueChange={(v) => updateProps({ level: Number(v) })} value={String(selected.props.level)}>
@@ -151,6 +176,7 @@ export default function Inspector({ nodes, setNodes, selectedId }: InspectorProp
               </SelectContent>
             </Select>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="alignH">Align</Label>
             <Select onValueChange={(v) => updateProps({ align: v })} value={selected.props.align ?? "left"}>
@@ -162,6 +188,28 @@ export default function Inspector({ nodes, setNodes, selectedId }: InspectorProp
               </SelectContent>
             </Select>
           </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-2">
+              <Label htmlFor="rotate">Rotate (deg)</Label>
+              <Input id="rotate" type="number" value={selected.props.rotate || 0} onChange={(e) => updateProps({ rotate: Number(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Absolute</Label>
+              <div className="flex items-center gap-2">
+                <input type="checkbox" checked={!!selected.props.absolute} onChange={(e)=> updateProps({ absolute: e.target.checked })} className="h-4 w-4" />
+                <span className="text-sm text-muted-foreground">Enable absolute positioning</span>
+              </div>
+            </div>
+          </div>
+
+          {selected.props.absolute && (
+            <div className="grid grid-cols-2 gap-2">
+              <Input type="number" value={selected.props.left || 0} onChange={(e)=> updateProps({ left: Number(e.target.value) })} />
+              <Input type="number" value={selected.props.top || 0} onChange={(e)=> updateProps({ top: Number(e.target.value) })} />
+            </div>
+          )}
+
         </div>
       )}
 
