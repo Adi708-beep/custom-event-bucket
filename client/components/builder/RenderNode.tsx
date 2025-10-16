@@ -115,7 +115,7 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
       return (
         <Wrapper>
-          <EditableText id={node.id} value={text} tag={Tag} className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`} style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ text: v.trim() })} />
+          <EditableText id={node.id} value={text} tag={Tag} className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`} style={{ ...(node.props?.fontSize ? { fontSize: typeof node.props.fontSize === 'number' ? `${node.props.fontSize}px` : node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ text: v.trim() })} />
         </Wrapper>
       );
     }
@@ -124,7 +124,7 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
       return (
         <Wrapper>
-          <EditableText id={node.id} value={text} tag="p" className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`} style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ text: v })} />
+          <EditableText id={node.id} value={text} tag="p" className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`} style={{ ...(node.props?.fontSize ? { fontSize: typeof node.props.fontSize === 'number' ? `${node.props.fontSize}px` : node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ text: v })} />
         </Wrapper>
       );
     }
@@ -187,8 +187,8 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
           <div className="flex items-center gap-4">
             <img src={photo} alt={name} className="h-16 w-16 rounded-full border object-cover" />
             <div>
-              <EditableText id={node.id} value={name} tag="div" className="font-medium" style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ name: v })} />
-              <EditableText id={`${node.id}_role`} value={role} tag="div" className="text-sm text-muted-foreground" style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ role: v })} />
+              <EditableText id={node.id} value={name} tag="div" className="font-medium" style={{ ...(node.props?.fontSize ? { fontSize: typeof node.props.fontSize === 'number' ? `${node.props.fontSize}px` : node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ name: v })} />
+              <EditableText id={`${node.id}_role`} value={role} tag="div" className="text-sm text-muted-foreground" style={{ ...(node.props?.fontSize ? { fontSize: typeof node.props.fontSize === 'number' ? `${node.props.fontSize}px` : node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ role: v })} />
             </div>
           </div>
         </Wrapper>
