@@ -124,7 +124,7 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
       return (
         <Wrapper>
-          <EditableText id={node.id} value={text} tag="p" className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`} onCommit={(v) => apply({ text: v })} />
+          <EditableText id={node.id} value={text} tag="p" className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`} style={{ ...(node.props?.fontSize ? { fontSize: node.props.fontSize } : {}), ...(node.props?.fontWeight ? { fontWeight: node.props.fontWeight } : {}), ...(node.props?.color ? { color: node.props.color } : {}), ...commonStyle }} onCommit={(v) => apply({ text: v })} />
         </Wrapper>
       );
     }
