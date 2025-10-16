@@ -27,27 +27,48 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
     const blockType = e.dataTransfer.getData(BLOCK_MIME);
     const movingId = e.dataTransfer.getData(NODE_MIME);
 
-    setNodes((prev) => {
-      let next = [...prev];
-      if (blockType) {
-        const spec = findSpec(blockType);
-        if (!spec) return prev;
-        const node = spec.defaultNode();
+    if (blockType) {
+      const spec = findSpec(blockType);
+      if (!spec) return;
+      const node = spec.defaultNode();
+      setNodes((prev) => {
+        const next = [...prev];
         next.splice(index, 0, node);
-        setSelectedId(node.id);
         return next;
-      }
-      if (movingId) {
+      });
+      setSelectedId(node.id);
+      // focus editable after drop
+      setTimeout(() => {
+        const el = document.querySelector(`[data-editable-id="${node.id}"]`) as HTMLElement | null;
+        if (el) {
+          el.focus();
+          try {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          } catch {}
+        }
+      }, 50);
+      setDragOverIndex(null);
+      return;
+    }
+
+    if (movingId) {
+      setNodes((prev) => {
+        let next = [...prev];
         const fromIdx = next.findIndex((n) => n.id === movingId);
         if (fromIdx === -1) return prev;
         const [moved] = next.splice(fromIdx, 1);
         const adjIndex = index > fromIdx ? index - 1 : index;
         next.splice(adjIndex, 0, moved);
         return next;
-      }
-      return prev;
-    });
-    setDragOverIndex(null);
+      });
+      setDragOverIndex(null);
+      return;
+    }
   };
 
   const handleInnerDropToSection = (sectionId: string, e: React.DragEvent) => {
