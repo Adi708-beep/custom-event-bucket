@@ -26,7 +26,7 @@ function widthStyleFor(node: BuilderNode) {
   return "100%";
 }
 
-function EditableText({ id, value, className, tag: Tag = "div", onCommit }: { id: string; value: string; className?: string; tag?: any; onCommit: (s: string) => void; }) {
+function EditableText({ id, value, className, tag: Tag = "div", onCommit, style }: { id: string; value: string; className?: string; tag?: any; onCommit: (s: string) => void; style?: React.CSSProperties }) {
   const ref = useRef<HTMLElement | null>(null);
   const [text, setText] = useState(value || "");
   const [editing, setEditing] = useState(false);
@@ -41,6 +41,7 @@ function EditableText({ id, value, className, tag: Tag = "div", onCommit }: { id
       data-editable-id={id}
       tabIndex={0}
       className={className}
+      style={style}
       contentEditable
       suppressContentEditableWarning
       onFocus={() => setEditing(true)}
