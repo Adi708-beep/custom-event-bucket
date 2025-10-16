@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="border-t bg-background">
       <div className="container mx-auto py-8 text-center text-sm text-muted-foreground">
         <p>
-          © {new Date().getFullYear()} EventCraft • Built for college event management
+          © {new Date().getFullYear()} EVENT BUCKET • Production-ready event pages for colleges — templates, RSVP, and publishing
         </p>
       </div>
     </footer>
