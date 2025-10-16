@@ -100,7 +100,15 @@ export default function Index() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
       {!isPreview && (
-        <Sidebar onDragStartBlock={() => {}} />
+        <div className="hidden lg:block">
+          <Sidebar onDragStartBlock={() => {}} />
+        </div>
+      )}
+
+      {!isPreview && (
+        <div className="hidden md:block">
+          <LayersPanel nodes={nodes} selectedId={selectedId} setSelectedId={setSelectedId} setNodes={(u) => setNodes((p)=> typeof u === 'function' ? (u as any)(p) : u)} />
+        </div>
       )}
 
       <div className="flex-1 flex flex-col">
