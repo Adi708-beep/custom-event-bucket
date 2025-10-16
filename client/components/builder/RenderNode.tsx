@@ -1,0 +1,90 @@
+import { BuilderNode } from "./types";
+import { Button } from "@/components/ui/button";
+
+export function RenderNode({ node }: { node: BuilderNode }) {
+  switch (node.type) {
+    case "section": {
+      const { paddingY = "py-12", background = "bg-white", align = "items-start" } = node.props || {};
+      return (
+        <section className={`${background}`}>
+          <div className={`container mx-auto ${paddingY} flex flex-col ${align} gap-4`}> 
+            {node.children?.map((c) => (
+              <RenderNode key={c.id} node={c} />
+            ))}
+          </div>
+        </section>
+      );
+    }
+    case "heading": {
+      const { text = "Heading", level = 2, align = "left" } = node.props || {};
+      const Tag = (level >= 1 && level <= 6 ? (`h${level}` as keyof JSX.IntrinsicElements) : "h2");
+      const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
+      return (
+        <Tag className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`}>
+          {text}
+        </Tag>
+      );
+    }
+    case "paragraph": {
+      const { text = "", align = "left" } = node.props || {};
+      const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
+      return <p className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`}>{text}</p>;
+    }
+    case "button": {
+      const { label = "Button", href = "#" } = node.props || {};
+      return (
+        <div>
+          <Button asChild>
+            <a href={href}>{label}</a>
+          </Button>
+        </div>
+      );
+    }
+    case "image": {
+      const { src = "/placeholder.svg", alt = "" } = node.props || {};
+      return <img src={src} alt={alt} className="rounded-lg border object-cover w-full max-w-3xl" />;
+    }
+    case "two-column": {
+      const { gap = "gap-8" } = node.props || {};
+      const [left, right] = node.children || [];
+      return (
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${gap}`}>
+          <div className="flex flex-col gap-4">{left && <RenderNode node={left} />}</div>
+          <div className="flex flex-col gap-4">{right && <RenderNode node={right} />}</div>
+        </div>
+      );
+    }
+    case "schedule": {
+      const { items = [] } = node.props || {};
+      return (
+        <div className="overflow-hidden rounded-lg border">
+          <table className="w-full text-sm">
+            <tbody>
+              {items.map((it: any, i: number) => (
+                <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-muted/50"}>
+                  <td className="px-4 py-3 font-medium text-foreground w-24 whitespace-nowrap">{it.time}</td>
+                  <td className="px-4 py-3">{it.title}</td>
+                  <td className="px-4 py-3 text-muted-foreground w-40 whitespace-nowrap">{it.location}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "speaker": {
+      const { name = "Guest Name", role = "", photo = "/placeholder.svg" } = node.props || {};
+      return (
+        <div className="flex items-center gap-4">
+          <img src={photo} alt={name} className="h-16 w-16 rounded-full border object-cover" />
+          <div>
+            <div className="font-medium">{name}</div>
+            <div className="text-sm text-muted-foreground">{role}</div>
+          </div>
+        </div>
+      );
+    }
+    default:
+      return null;
+  }
+}
