@@ -55,10 +55,19 @@ export default function Index() {
       } catch {}
     }
     setNodes(sampleEventTemplate());
+
+    // load theme
+    const theme = localStorage.getItem('eventbucket:theme');
+    if (theme) {
+      const p = palettes.find((x)=> x.id === theme);
+      if (p) applyPalette(p);
+    }
   }, []);
 
   const doSave = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
+    const theme = localStorage.getItem('eventbucket:theme') || palettes[0].id;
+    localStorage.setItem('eventbucket:theme', theme);
     toast.success("Page saved");
   };
   const doLoad = () => {
@@ -103,6 +112,44 @@ export default function Index() {
               <Button variant="secondary" onClick={doSave}>Save</Button>
               <Button variant="outline" onClick={doExportJson}>Export JSON</Button>
               <Button onClick={() => setIsPreview((v) => !v)}>{isPreview ? "Exit Preview" : "Preview"}</Button>
+
+              <div className="hidden md:flex items-center gap-2">
+                <div className="relative">
+                  <button className="rounded-md border bg-background px-3 py-2 text-sm" onClick={() => {
+                    const t1 = sampleEventTemplate();
+                    setNodes(t1);
+                    toast.success("Loaded template: Campus Fest");
+                  }}>Template: Campus</button>
+                </div>
+                <div className="relative">
+                  <button className="rounded-md border bg-background px-3 py-2 text-sm" onClick={() => {
+                    // simple alternative template
+                    const nodes = [
+                      blockSpecs.find((b)=> b.type === 'section')!.defaultNode(),
+                      blockSpecs.find((b)=> b.type === 'section')!.defaultNode(),
+                    ];
+                    nodes[0].children = [
+                      { id: `${nodes[0].id}_h`, type: 'heading', props: { text: 'Club Meet 2025', level: 1, align: 'center' } },
+                      { id: `${nodes[0].id}_p`, type: 'paragraph', props: { text: 'Join your campus club for a meetup and fun activities.', align: 'center' } }
+                    ];
+                    nodes[1].children = [ { id: `${nodes[1].id}_h2`, type: 'heading', props: { text: 'Workshops', level: 2 } } ];
+                    setNodes(nodes);
+                    toast.success('Loaded template: Club Meet');
+                  }}>Template: Club</button>
+                </div>
+                <div className="relative">
+                  <button className="rounded-md border bg-background px-3 py-2 text-sm" onClick={() => {
+                    // speaker focused
+                    const s = blockSpecs.find((b)=> b.type === 'section')!.defaultNode();
+                    s.children = [ { id: `${s.id}_h`, type: 'heading', props: { text: 'Speakers Lineup', level: 1 } }, blockSpecs.find((b)=> b.type === 'speaker')!.defaultNode() ];
+                    setNodes([s]);
+                    toast.success('Loaded template: Speakers');
+                  }}>Template: Speakers</button>
+                </div>
+
+                <ThemePicker onApply={(id)=> toast.success(`Applied theme ${id}`)} />
+              </div>
+
             </div>
           </div>
         </div>

@@ -168,7 +168,7 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
                   }}
                   onDrop={(e) => handleInnerDropToSection(n.id, e)}
                 >
-                  <RenderNode node={n} />
+                  <RenderNode node={n} setNodes={setNodes} />
                   {!isPreview && (
                     <div className="mt-3 rounded-md border border-dashed bg-muted/40 p-3 text-center text-xs text-muted-foreground">
                       Drag items here to add inside this section
@@ -176,7 +176,7 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
                   )}
                 </div>
               ) : (
-                <RenderNode node={n} />
+                <RenderNode node={n} setNodes={setNodes} />
               )}
             </Outline>
             {!isPreview && <DropLine index={i + 1} />}
