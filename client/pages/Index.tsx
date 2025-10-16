@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Sidebar from "@/components/builder/Sidebar";
+import LayersPanel from "@/components/builder/LayersPanel";
+import TextToolbar from "@/components/builder/TextToolbar";
 import Canvas from "@/components/builder/Canvas";
 import Inspector from "@/components/builder/Inspector";
 import { blockSpecs } from "@/components/builder/blocks";
