@@ -8,7 +8,9 @@ export default function Sidebar({ onDragStartBlock }: SidebarProps) {
   return (
     <aside className="w-full md:w-64 shrink-0 border-r bg-muted/30">
       <div className="p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Blocks</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+          Blocks
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
           {blockSpecs.map((b) => (
             <button
@@ -24,7 +26,9 @@ export default function Sidebar({ onDragStartBlock }: SidebarProps) {
               <div>
                 <div className="text-sm font-medium">{b.title}</div>
                 {b.description && (
-                  <div className="text-xs text-muted-foreground">{b.description}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {b.description}
+                  </div>
                 )}
               </div>
             </button>

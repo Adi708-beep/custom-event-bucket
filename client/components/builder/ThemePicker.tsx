@@ -33,7 +33,7 @@ export const palettes = [
   },
 ];
 
-export function applyPalette(p: typeof palettes[0]) {
+export function applyPalette(p: (typeof palettes)[0]) {
   const root = document.documentElement;
   Object.entries(p.vars).forEach(([k, v]) => {
     root.style.setProperty(k, v);
@@ -41,10 +41,16 @@ export function applyPalette(p: typeof palettes[0]) {
   localStorage.setItem("eventbucket:theme", p.id);
 }
 
-export default function ThemePicker({ onApply }: { onApply?: (id: string) => void }) {
+export default function ThemePicker({
+  onApply,
+}: {
+  onApply?: (id: string) => void;
+}) {
   return (
     <div className="p-3">
-      <div className="text-xs font-semibold text-muted-foreground mb-2">Themes</div>
+      <div className="text-xs font-semibold text-muted-foreground mb-2">
+        Themes
+      </div>
       <div className="flex gap-2">
         {palettes.map((p) => (
           <button

@@ -13,13 +13,21 @@ function findSpec(type: string) {
 
 type CanvasProps = {
   nodes: BuilderNode[];
-  setNodes: (updater: (prev: BuilderNode[]) => BuilderNode[] | BuilderNode[]) => void;
+  setNodes: (
+    updater: (prev: BuilderNode[]) => BuilderNode[] | BuilderNode[],
+  ) => void;
   selectedId: NodeID | null;
   setSelectedId: (id: NodeID | null) => void;
   isPreview?: boolean;
 };
 
-export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isPreview }: CanvasProps) {
+export default function Canvas({
+  nodes,
+  setNodes,
+  selectedId,
+  setSelectedId,
+  isPreview,
+}: CanvasProps) {
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   const onDropAt = (index: number, e: React.DragEvent) => {
@@ -39,7 +47,9 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
       setSelectedId(node.id);
       // focus editable after drop
       setTimeout(() => {
-        const el = document.querySelector(`[data-editable-id="${node.id}"]`) as HTMLElement | null;
+        const el = document.querySelector(
+          `[data-editable-id="${node.id}"]`,
+        ) as HTMLElement | null;
         if (el) {
           el.focus();
           try {
@@ -93,7 +103,9 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
       });
       setSelectedId(node.id);
       setTimeout(() => {
-        const el = document.querySelector(`[data-editable-id="${node.id}"]`) as HTMLElement | null;
+        const el = document.querySelector(
+          `[data-editable-id="${node.id}"]`,
+        ) as HTMLElement | null;
         if (el) {
           el.focus();
           try {
@@ -127,17 +139,34 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
     }
   };
 
-  const Outline = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const Outline = ({
+    id,
+    children,
+  }: {
+    id: string;
+    children: React.ReactNode;
+  }) => {
     const startResize = (e: React.MouseEvent) => {
       e.stopPropagation();
       const startX = e.clientX;
-      const el = document.querySelector(`[data-node-id="${id}"]`) as HTMLElement | null;
+      const el = document.querySelector(
+        `[data-node-id="${id}"]`,
+      ) as HTMLElement | null;
       if (!el) return;
       const startWidth = el.getBoundingClientRect().width;
       const onMove = (ev: MouseEvent) => {
         const delta = ev.clientX - startX;
         const newW = Math.max(120, Math.round(startWidth + delta));
-        setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, props: { ...n.props, width: "custom", customWidth: newW } } : n)));
+        setNodes((prev) =>
+          prev.map((n) =>
+            n.id === id
+              ? {
+                  ...n,
+                  props: { ...n.props, width: "custom", customWidth: newW },
+                }
+              : n,
+          ),
+        );
       };
       const onUp = () => {
         document.removeEventListener("mousemove", onMove);
@@ -208,7 +237,9 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
                         const next = [...prev];
                         const at = next.findIndex((x) => x.id === n.id);
                         if (at === -1) return prev;
-                        const clone = JSON.parse(JSON.stringify(next[at])) as BuilderNode;
+                        const clone = JSON.parse(
+                          JSON.stringify(next[at]),
+                        ) as BuilderNode;
                         clone.id = `${clone.id}_copy`;
                         next.splice(at + 1, 0, clone);
                         return next;
