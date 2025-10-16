@@ -127,22 +127,50 @@ export default function Canvas({ nodes, setNodes, selectedId, setSelectedId, isP
     }
   };
 
-  const Outline = ({ id, children }: { id: string; children: React.ReactNode }) => (
-    <div
-      draggable={!isPreview}
-      onDragStart={(e) => {
-        if (isPreview) return;
-        e.dataTransfer.setData(NODE_MIME, id);
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!isPreview) setSelectedId(id);
-      }}
-      className={`relative rounded-lg transition ring-offset-2 ${selectedId === id ? "ring-2 ring-primary" : "ring-0"}`}
-    >
-      {children}
-    </div>
-  );
+  const Outline = ({ id, children }: { id: string; children: React.ReactNode }) => {
+    const startResize = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const startX = e.clientX;
+      const el = document.querySelector(`[data-node-id="${id}"]`) as HTMLElement | null;
+      if (!el) return;
+      const startWidth = el.getBoundingClientRect().width;
+      const onMove = (ev: MouseEvent) => {
+        const delta = ev.clientX - startX;
+        const newW = Math.max(120, Math.round(startWidth + delta));
+        setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, props: { ...n.props, width: "custom", customWidth: newW } } : n)));
+      };
+      const onUp = () => {
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+      };
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    };
+
+    return (
+      <div
+        draggable={!isPreview}
+        onDragStart={(e) => {
+          if (isPreview) return;
+          e.dataTransfer.setData(NODE_MIME, id);
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!isPreview) setSelectedId(id);
+        }}
+        className={`relative rounded-lg transition ring-offset-2 ${selectedId === id ? "ring-2 ring-primary" : "ring-0"}`}
+      >
+        {children}
+        {selectedId === id && !isPreview && (
+          <div
+            onMouseDown={startResize}
+            className="absolute -right-2 -bottom-2 z-20 h-4 w-4 bg-white border rounded-sm cursor-se-resize"
+            title="Resize"
+          />
+        )}
+      </div>
+    );
+  };
 
   const DropLine = ({ index }: { index: number }) => (
     <div
