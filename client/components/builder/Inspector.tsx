@@ -54,6 +54,48 @@ export default function Inspector({ nodes, setNodes, selectedId }: InspectorProp
         <div className="text-lg font-semibold">{selected.type}</div>
       </div>
 
+      <div className="mb-4 space-y-3">
+        <div className="text-sm font-medium">Appearance</div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <input
+              id="frameToggle"
+              type="checkbox"
+              checked={!!selected.props.frame}
+              onChange={(e) => updateProps({ frame: e.target.checked })}
+              className="h-4 w-4"
+            />
+            <label htmlFor="frameToggle" className="text-sm">Frame</label>
+          </div>
+          <div className="text-xs text-muted-foreground">Add border and padding</div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm">Width</label>
+          <div className="flex items-center gap-2">
+            <select
+              value={selected.props.width || "full"}
+              onChange={(e) => updateProps({ width: e.target.value })}
+              className="rounded-md border bg-background px-2 py-1 text-sm"
+            >
+              <option value="full">Full</option>
+              <option value="3/4">3/4</option>
+              <option value="2/3">2/3</option>
+              <option value="1/2">1/2</option>
+              <option value="custom">Custom (px)</option>
+            </select>
+            {selected.props.width === "custom" && (
+              <Input
+                type="number"
+                value={selected.props.customWidth || 800}
+                onChange={(e) => updateProps({ customWidth: Number(e.target.value) })}
+                className="w-24"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
       {selected.type === "section" && (
         <div className="space-y-4">
           <div className="space-y-2">
