@@ -1,6 +1,6 @@
 import { BuilderNode } from "./types";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type SetNodes = (updater: (prev: BuilderNode[]) => BuilderNode[] | BuilderNode[]) => void;
 
@@ -24,6 +24,53 @@ function widthStyleFor(node: BuilderNode) {
   if (w === "1/2") return "50%";
   if (w === "custom") return (node.props?.customWidth ? `${node.props.customWidth}px` : "800px");
   return "100%";
+}
+
+function EditableText({ id, value, className, tag: Tag = "div", onCommit }: { id: string; value: string; className?: string; tag?: any; onCommit: (s: string) => void; }) {
+  const ref = useRef<HTMLElement | null>(null);
+  const [text, setText] = useState(value || "");
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (!editing) setText(value || "");
+  }, [value, editing]);
+
+  return (
+    <Tag
+      ref={(r: any) => (ref.current = r)}
+      data-editable-id={id}
+      tabIndex={0}
+      className={className}
+      contentEditable
+      suppressContentEditableWarning
+      onFocus={() => setEditing(true)}
+      onBlur={(e) => {
+        setEditing(false);
+        const v = e.currentTarget.textContent || "";
+        setText(v);
+        onCommit(v);
+      }}
+      onInput={(e) => {
+        setText(e.currentTarget.textContent || "");
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") {
+          // revert
+          setText(value || "");
+          (ref.current as any).textContent = value || "";
+          (ref.current as any).blur();
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          // commit
+          const v = (ref.current as any).textContent || "";
+          onCommit(v);
+          (ref.current as any).blur();
+        }
+      }}
+    >
+      {text}
+    </Tag>
+  );
 }
 
 export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: SetNodes }) {
@@ -60,16 +107,7 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
       return (
         <Wrapper>
-          <Tag
-            data-editable-id={node.id}
-            tabIndex={0}
-            className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`}
-            contentEditable={!!setNodes}
-            suppressContentEditableWarning
-            onInput={(e) => apply({ text: (e.currentTarget.textContent || "").trim() })}
-          >
-            {text}
-          </Tag>
+          <EditableText id={node.id} value={text} tag={Tag} className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`} onCommit={(v) => apply({ text: v.trim() })} />
         </Wrapper>
       );
     }
@@ -78,16 +116,7 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
       return (
         <Wrapper>
-          <p
-            data-editable-id={node.id}
-            tabIndex={0}
-            className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`}
-            contentEditable={!!setNodes}
-            suppressContentEditableWarning
-            onInput={(e) => apply({ text: e.currentTarget.textContent || "" })}
-          >
-            {text}
-          </p>
+          <EditableText id={node.id} value={text} tag="p" className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`} onCommit={(v) => apply({ text: v })} />
         </Wrapper>
       );
     }
@@ -97,8 +126,8 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
         <Wrapper>
           <div>
             <Button asChild>
-              <a data-editable-id={node.id} tabIndex={0} href={href} contentEditable={!!setNodes} suppressContentEditableWarning onInput={(e) => apply({ label: e.currentTarget.textContent || "" })}>
-                {label}
+              <a data-editable-id={node.id} tabIndex={0} href={href}>
+                <EditableText id={node.id} value={label} tag="span" onCommit={(v) => apply({ label: v })} />
               </a>
             </Button>
           </div>
@@ -150,12 +179,8 @@ export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: S
           <div className="flex items-center gap-4">
             <img src={photo} alt={name} className="h-16 w-16 rounded-full border object-cover" />
             <div>
-              <div className="font-medium" data-editable-id={node.id} tabIndex={0} contentEditable={!!setNodes} suppressContentEditableWarning onInput={(e) => apply({ name: e.currentTarget.textContent || "" })}>
-                {name}
-              </div>
-              <div className="text-sm text-muted-foreground" data-editable-id={`${node.id}_role`} tabIndex={0} contentEditable={!!setNodes} suppressContentEditableWarning onInput={(e) => apply({ role: e.currentTarget.textContent || "" })}>
-                {role}
-              </div>
+              <EditableText id={node.id} value={name} tag="div" className="font-medium" onCommit={(v) => apply({ name: v })} />
+              <EditableText id={`${node.id}_role`} value={role} tag="div" className="text-sm text-muted-foreground" onCommit={(v) => apply({ role: v })} />
             </div>
           </div>
         </Wrapper>
