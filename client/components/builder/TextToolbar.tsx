@@ -13,7 +13,7 @@ export default function TextToolbar({ visible }: { visible: boolean }) {
       <button className="px-2 py-1 text-sm" onMouseDown={(e) => { e.preventDefault(); exec('bold'); }}>Bold</button>
       <button className="px-2 py-1 text-sm" onMouseDown={(e) => { e.preventDefault(); exec('italic'); }}>Italic</button>
       <button className="px-2 py-1 text-sm" onMouseDown={(e) => { e.preventDefault(); exec('underline'); }}>Underline</button>
-      <button className="px-2 py-1 text-sm" onMouseDown={(e) => { e.preventDefault(); { const url = prompt('URL'); if (url) exec('createLink'); const sel = window.getSelection(); /* noop */ } }}>Link</button>
+      <button className="px-2 py-1 text-sm" onMouseDown={(e) => { e.preventDefault(); const url = prompt('URL'); if (url) { try { document.execCommand('createLink', false, url); } catch {} } }}>Link</button>
     </div>
   );
 }
