@@ -106,6 +106,19 @@ export default function Index() {
             </div>
           </div>
         </div>
+
+        <div className="bg-secondary/5 border-b p-4">
+          <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <div className="text-sm text-muted-foreground">
+              Tip: Drag blocks from the left into the canvas. Click a block to edit on the right. Use Save to persist in your browser.
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => { setNodes(sampleEventTemplate()); setSelectedId(null); }}>Load Template</Button>
+              <Button onClick={() => { navigator.clipboard?.writeText(location.href); toast.success("Shareable link copied"); }}>Copy Share Link</Button>
+            </div>
+          </div>
+        </div>
+
         <div className="flex-1">
           <Canvas
             nodes={nodes}
