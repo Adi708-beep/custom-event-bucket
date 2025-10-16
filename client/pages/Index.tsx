@@ -17,7 +17,7 @@ function sampleEventTemplate(): BuilderNode[] {
     align: "items-center",
   };
   sectionHero.children = [
-    { id: `${sectionHero.id}_h1`, type: "heading", props: { text: "Campus Fest 2025", level: 1, align: "center" } },
+    { id: `${sectionHero.id}_h1`, type: "heading", props: { text: "EVENT BUCKET Presents: Campus Fest 2025", level: 1, align: "center" } },
     { id: `${sectionHero.id}_p1`, type: "paragraph", props: { text: "A week of innovation, culture, and community. Join workshops, talks, and celebrations across campus.", align: "center" } },
     { id: `${sectionHero.id}_b1`, type: "button", props: { label: "Register Now", href: "#register" } },
   ];
