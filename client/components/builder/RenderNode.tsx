@@ -1,15 +1,35 @@
 import { BuilderNode } from "./types";
 import { Button } from "@/components/ui/button";
+import React from "react";
 
-export function RenderNode({ node }: { node: BuilderNode }) {
+type SetNodes = (updater: (prev: BuilderNode[]) => BuilderNode[] | BuilderNode[]) => void;
+
+function updatePropsInTree(prev: BuilderNode[], id: string, patch: Record<string, any>): BuilderNode[] {
+  return prev.map((n) => {
+    if (n.id === id) {
+      return { ...n, props: { ...n.props, ...patch } };
+    }
+    if (n.children) {
+      return { ...n, children: updatePropsInTree(n.children, id, patch) };
+    }
+    return n;
+  });
+}
+
+export function RenderNode({ node, setNodes }: { node: BuilderNode; setNodes?: SetNodes }) {
+  const apply = (patch: Record<string, any>) => {
+    if (!setNodes) return;
+    setNodes((prev) => updatePropsInTree(prev, node.id, patch));
+  };
+
   switch (node.type) {
     case "section": {
       const { paddingY = "py-12", background = "bg-white", align = "items-start" } = node.props || {};
       return (
         <section className={`${background}`}>
-          <div className={`container mx-auto ${paddingY} flex flex-col ${align} gap-4`}> 
+          <div className={`container mx-auto ${paddingY} flex flex-col ${align} gap-4`}>
             {node.children?.map((c) => (
-              <RenderNode key={c.id} node={c} />
+              <RenderNode key={c.id} node={c} setNodes={setNodes} />
             ))}
           </div>
         </section>
@@ -20,7 +40,12 @@ export function RenderNode({ node }: { node: BuilderNode }) {
       const Tag = (level >= 1 && level <= 6 ? (`h${level}` as keyof JSX.IntrinsicElements) : "h2");
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
       return (
-        <Tag className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`}>
+        <Tag
+          className={`font-extrabold tracking-tight ${alignCls} ${level === 1 ? "text-4xl md:text-6xl" : level === 2 ? "text-3xl md:text-5xl" : "text-2xl md:text-3xl"}`}
+          contentEditable={!!setNodes}
+          suppressContentEditableWarning
+          onInput={(e) => apply({ text: (e.currentTarget.textContent || "").trim() })}
+        >
           {text}
         </Tag>
       );
@@ -28,14 +53,25 @@ export function RenderNode({ node }: { node: BuilderNode }) {
     case "paragraph": {
       const { text = "", align = "left" } = node.props || {};
       const alignCls = align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left";
-      return <p className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`}>{text}</p>;
+      return (
+        <p
+          className={`text-muted-foreground leading-relaxed ${alignCls} max-w-3xl`}
+          contentEditable={!!setNodes}
+          suppressContentEditableWarning
+          onInput={(e) => apply({ text: e.currentTarget.textContent || "" })}
+        >
+          {text}
+        </p>
+      );
     }
     case "button": {
       const { label = "Button", href = "#" } = node.props || {};
       return (
         <div>
           <Button asChild>
-            <a href={href}>{label}</a>
+            <a href={href} contentEditable={!!setNodes} suppressContentEditableWarning onInput={(e) => apply({ label: e.currentTarget.textContent || "" })}>
+              {label}
+            </a>
           </Button>
         </div>
       );
@@ -49,8 +85,8 @@ export function RenderNode({ node }: { node: BuilderNode }) {
       const [left, right] = node.children || [];
       return (
         <div className={`grid grid-cols-1 md:grid-cols-2 ${gap}`}>
-          <div className="flex flex-col gap-4">{left && <RenderNode node={left} />}</div>
-          <div className="flex flex-col gap-4">{right && <RenderNode node={right} />}</div>
+          <div className="flex flex-col gap-4">{left && <RenderNode node={left} setNodes={setNodes} />}</div>
+          <div className="flex flex-col gap-4">{right && <RenderNode node={right} setNodes={setNodes} />}</div>
         </div>
       );
     }
@@ -78,8 +114,12 @@ export function RenderNode({ node }: { node: BuilderNode }) {
         <div className="flex items-center gap-4">
           <img src={photo} alt={name} className="h-16 w-16 rounded-full border object-cover" />
           <div>
-            <div className="font-medium">{name}</div>
-            <div className="text-sm text-muted-foreground">{role}</div>
+            <div className="font-medium" contentEditable={!!setNodes} suppressContentEditableWarning onInput={(e) => apply({ name: e.currentTarget.textContent || "" })}>
+              {name}
+            </div>
+            <div className="text-sm text-muted-foreground" contentEditable={!!setNodes} suppressContentEditableWarning onInput={(e) => apply({ role: e.currentTarget.textContent || "" })}>
+              {role}
+            </div>
           </div>
         </div>
       );
