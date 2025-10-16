@@ -177,7 +177,7 @@ export default function Index() {
           </div>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <Canvas
             nodes={nodes}
             setNodes={(updater) =>
@@ -187,6 +187,7 @@ export default function Index() {
             setSelectedId={setSelectedId}
             isPreview={isPreview}
           />
+          <TextToolbar visible={!!selectedId} />
         </div>
       </div>
 
