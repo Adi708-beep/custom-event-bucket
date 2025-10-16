@@ -80,7 +80,7 @@ export default function Index() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "eventcraft-page.json";
+    a.download = "eventbucket-page.json";
     a.click();
     URL.revokeObjectURL(url);
   };
