@@ -1,62 +1,127 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Sidebar from "@/components/builder/Sidebar";
+import Canvas from "@/components/builder/Canvas";
+import Inspector from "@/components/builder/Inspector";
+import { blockSpecs } from "@/components/builder/blocks";
+import { BuilderNode, NodeID } from "@/components/builder/types";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+const STORAGE_KEY = "eventcraft:page";
+
+function sampleEventTemplate(): BuilderNode[] {
+  const sectionHero = blockSpecs.find((b) => b.type === "section")!.defaultNode();
+  sectionHero.props = {
+    paddingY: "py-20",
+    background: "bg-gradient-to-br from-primary/10 to-fuchsia-200/40",
+    align: "items-center",
+  };
+  sectionHero.children = [
+    { id: `${sectionHero.id}_h1`, type: "heading", props: { text: "Campus Fest 2025", level: 1, align: "center" } },
+    { id: `${sectionHero.id}_p1`, type: "paragraph", props: { text: "A week of innovation, culture, and community. Join workshops, talks, and celebrations across campus.", align: "center" } },
+    { id: `${sectionHero.id}_b1`, type: "button", props: { label: "Register Now", href: "#register" } },
+  ];
+
+  const sectionSchedule = blockSpecs.find((b) => b.type === "section")!.defaultNode();
+  sectionSchedule.children = [
+    { id: `${sectionSchedule.id}_h2`, type: "heading", props: { text: "Schedule", level: 2 } },
+    blockSpecs.find((b) => b.type === "schedule")!.defaultNode(),
+  ];
+
+  const sectionSpeakers = blockSpecs.find((b) => b.type === "section")!.defaultNode();
+  sectionSpeakers.children = [
+    { id: `${sectionSpeakers.id}_h2`, type: "heading", props: { text: "Speakers", level: 2 } },
+    { id: `${sectionSpeakers.id}_c1`, type: "two-column", props: { gap: "gap-8" }, children: [
+      { id: `${sectionSpeakers.id}_s1`, type: "speaker", props: { name: "Alex Kumar", role: "Keynote", photo: "/placeholder.svg" } },
+      { id: `${sectionSpeakers.id}_s2`, type: "speaker", props: { name: "Priya Shah", role: "Panelist", photo: "/placeholder.svg" } },
+    ] },
+  ];
+
+  return [sectionHero, sectionSchedule, sectionSpeakers];
+}
 
 export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
+  const [nodes, setNodes] = useState<BuilderNode[]>([]);
+  const [selectedId, setSelectedId] = useState<NodeID | null>(null);
+  const [isPreview, setIsPreview] = useState(false);
+
   useEffect(() => {
-    fetchDemo();
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as BuilderNode[];
+        setNodes(parsed);
+        return;
+      } catch {}
+    }
+    setNodes(sampleEventTemplate());
   }, []);
 
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
+  const doSave = () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nodes));
+    toast.success("Page saved");
+  };
+  const doLoad = () => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return toast.error("No saved page found");
     try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
+      setNodes(JSON.parse(saved));
+      toast.success("Loaded saved page");
+    } catch {
+      toast.error("Failed to load saved page");
     }
+  };
+  const doNew = () => {
+    setNodes(sampleEventTemplate());
+    setSelectedId(null);
+  };
+  const doExportJson = () => {
+    const blob = new Blob([JSON.stringify(nodes, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "eventcraft-page.json";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
+    <div className="flex min-h-[calc(100vh-4rem)]">
+      {!isPreview && (
+        <Sidebar onDragStartBlock={() => {}} />
+      )}
+
+      <div className="flex-1 flex flex-col">
+        <div className="border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto flex h-14 items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="hidden sm:inline">Build your event page with drag & drop</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={doNew}>New</Button>
+              <Button variant="outline" onClick={doLoad}>Load</Button>
+              <Button variant="secondary" onClick={doSave}>Save</Button>
+              <Button variant="outline" onClick={doExportJson}>Export JSON</Button>
+              <Button onClick={() => setIsPreview((v) => !v)}>{isPreview ? "Exit Preview" : "Preview"}</Button>
+            </div>
+          </div>
+        </div>
+        <div className="flex-1">
+          <Canvas
+            nodes={nodes}
+            setNodes={(updater) =>
+              setNodes((prev) => (typeof updater === "function" ? (updater as any)(prev) : updater))
+            }
+            selectedId={selectedId}
+            setSelectedId={setSelectedId}
+            isPreview={isPreview}
+          />
+        </div>
       </div>
+
+      {!isPreview && (
+        <Inspector nodes={nodes} setNodes={(updater) => setNodes((prev) => (typeof updater === "function" ? (updater as any)(prev) : updater))} selectedId={selectedId} />
+      )}
     </div>
   );
 }
